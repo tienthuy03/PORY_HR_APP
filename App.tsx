@@ -1,118 +1,110 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState, useEffect } from 'react';
+import { Provider, useSelector, useDispatch } from 'react-redux';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import LoginScreen from './src/screens/SystemScreens/LoginScreen';
+import ConfigScreen from './src/screens/SystemScreens/ConfigScreen';
+import MainApp from './src/screens/MainScreens/MainApp';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import './src/config/i18n';
+import { store } from './src/redux/store';
+import { loadUserFromStorage, logoutUser } from './src/redux/slices/authSlice';
+import { loadSettingsFromStorage } from './src/redux/slices/settingsSlice';
+// Import vector icons fonts
+import 'react-native-vector-icons/MaterialCommunityIcons';
+import 'react-native-vector-icons/MaterialIcons';
+import 'react-native-vector-icons/Ionicons';
+import 'react-native-vector-icons/FontAwesome';
+import 'react-native-vector-icons/FontAwesome5';
+import 'react-native-vector-icons/AntDesign';
+import 'react-native-vector-icons/Entypo';
+import 'react-native-vector-icons/EvilIcons';
+import 'react-native-vector-icons/Feather';
+import 'react-native-vector-icons/Foundation';
+import 'react-native-vector-icons/Octicons';
+import 'react-native-vector-icons/SimpleLineIcons';
+import 'react-native-vector-icons/Zocial';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const AppContent = () => {
+  const dispatch = useDispatch<any>();
+  const { isAuthenticated, loading } = useSelector((state: any) => state.auth);
+  const [isConfigured, setIsConfigured] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  useEffect(() => {
+    checkAppStatus();
+  }, []);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+  const checkAppStatus = async () => {
+    try {
+      const clientId = await AsyncStorage.getItem('CLIENT_ID');
+      const apiUrl = await AsyncStorage.getItem('API_URL');
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+      if (clientId && apiUrl) {
+        setIsConfigured(true);
+        // Load user data and settings from storage if configuration exists
+        await Promise.all([
+          dispatch(loadUserFromStorage()),
+          dispatch(loadSettingsFromStorage()),
+        ]);
+      } else {
+        setIsConfigured(false);
+      }
+    } catch (error) {
+      console.error('Error checking app status:', error);
+      setIsConfigured(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
+  const handleConfigurationSuccess = () => {
+    setIsConfigured(true);
+  };
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+  const handleLoginSuccess = () => {
+    // Login success is handled by Redux, no need to set state here
+  };
+
+  const handleNavigateToConfig = () => {
+    setIsConfigured(false);
+  };
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+  };
+
+  if (isLoading || loading) {
+    return null; // Hoặc có thể hiển thị loading screen
+  }
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      {!isConfigured ? (
+        <ConfigScreen onConfigurationSuccess={handleConfigurationSuccess} />
+      ) : !isAuthenticated ? (
+        <LoginScreen
+          onLoginSuccess={handleLoginSuccess}
+          onNavigateToConfig={handleNavigateToConfig}
+        />
+      ) : (
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <MainApp onLogout={handleLogout} />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      )}
+    </GestureHandlerRootView>
+  );
+};
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
+  );
+};
 
 export default App;

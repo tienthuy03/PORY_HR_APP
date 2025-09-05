@@ -23,6 +23,9 @@ target 'PORYHR_APP' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # React Native Vector Icons
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   target 'PORYHR_APPTests' do
     inherit! :complete
     # Pods for testing
@@ -36,5 +39,14 @@ target 'PORYHR_APP' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    
+    # Copy vector icons fonts
+    installer.pods_project.targets.each do |target|
+      if target.name == 'RNVectorIcons'
+        target.build_configurations.each do |config|
+          config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+        end
+      end
+    end
   end
 end
