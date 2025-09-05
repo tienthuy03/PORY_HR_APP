@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useIsFocused } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,22 +11,24 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTheme } from '../../../hooks/useTheme';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import NotificationDetailModal from '../../../components/NotificationDetailModal';
 import AppHeader from '../../../components/AppHeader';
 import AppIcon from '../../../components/AppIcon';
 
 const NotificationScreen = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
-  const [valueNoti, setValueNoti] = useState('Thông báo');
+  const [valueNoti, setValueNoti] = useState(t('navNotification'));
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [notificationList, setNotificationList] = useState([]);
 
   // HR related notification data
-  const notifications = [
+  const notifications = useMemo(() => [
     {
       id: 1,
       type: 'salary',
@@ -74,8 +76,8 @@ const NotificationScreen = () => {
     {
       id: 5,
       type: 'error',
-      title: 'Lỗi chấm công',
-      message: 'Không thể thực hiện chấm công. Vui lòng thử lại.',
+      title: t('attendanceError'),
+      message: t('attendanceErrorMessage'),
       time: '1 giờ trước',
       icon: 'alert-circle',
       color: '#F44336',
@@ -104,7 +106,7 @@ const NotificationScreen = () => {
       backgroundColor: '#FFF3E0',
       isRead: true
     }
-  ];
+  ], [t]);
 
   // Initialize notification list
   React.useEffect(() => {

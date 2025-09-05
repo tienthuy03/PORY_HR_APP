@@ -3,13 +3,10 @@ import { View, FlatList, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../hooks/useTheme';
-import { sysFetch } from '../services/api';
-import { STORAGE_KEYS } from '../constants/storageKeys';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import MenuItem_Children from '../components/MenuItem';
+import MenuItemWithCounts from '../components/MenuItem/MenuItemWithCounts';
 import EmptyState from '../components/EmptyState';
 
-const List_MBHRIN = ({ menuData, onNavigate }) => {
+const List_MBHRAP = ({ menuData, onNavigate }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const dispatch = useDispatch();
@@ -25,10 +22,10 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
     console.warn('Error getting menu data:', error);
   }
 
-  const [dataMenuMBHRIN, setDataMenuMBHRIN] = useState([]);
+  const [dataMenuMBHRAP, setDataMenuMBHRAP] = useState([]);
 
   useEffect(() => {
-    console.log('=== List_MBHRIN Debug ===');
+    console.log('=== List_MBHRAP Debug ===');
     console.log('dataMenuMBHRs:', dataMenuMBHRs);
     console.log('dataMenuMBHRs length:', dataMenuMBHRs?.length);
 
@@ -37,33 +34,35 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
       console.log('All menu items:');
       dataMenuMBHRs.forEach((item, index) => {
         console.log(`[${index}] menu_cd: ${item.menu_cd}, pk: ${item.pk}, p_pk: ${item.p_pk}, title: ${item.vie || item.title || item.eng}`);
+        console.log(`  - count_approve_1: ${item.count_approve_1}, count_approve_2: ${item.count_approve_2}, count_approve_3: ${item.count_approve_3}`);
       });
 
-      // Tìm menu cha MBHRIN
-      const mbhrinParent = dataMenuMBHRs.find(i => i.menu_cd === 'MBHRIN');
-      console.log('MBHRIN parent menu:', mbhrinParent);
+      // Tìm menu cha MBHRAP
+      const mbhrapParent = dataMenuMBHRs.find(i => i.menu_cd === 'MBHRAP');
+      console.log('MBHRAP parent menu:', mbhrapParent);
 
-      if (mbhrinParent) {
-        // Lọc các menu con có p_pk trùng với pk của MBHRIN
+      if (mbhrapParent) {
+        // Lọc các menu con có p_pk trùng với pk của MBHRAP
         const childMenus = dataMenuMBHRs.filter(item => {
-          const isChild = item.p_pk === mbhrinParent.pk;
+          const isChild = item.p_pk === mbhrapParent.pk;
           if (isChild) {
             console.log(`Found child menu: ${item.menu_cd} (pk: ${item.pk}, p_pk: ${item.p_pk})`);
+            console.log(`  - Counts: ${item.count_approve_1}, ${item.count_approve_2}, ${item.count_approve_3}`);
           }
           return isChild;
         });
 
         console.log('Total child menus found:', childMenus.length);
         console.log('Child menus:', childMenus);
-        setDataMenuMBHRIN(childMenus);
+        setDataMenuMBHRAP(childMenus);
       } else {
-        console.warn('MBHRIN parent menu not found in dataMenuMBHRs');
+        console.warn('MBHRAP parent menu not found in dataMenuMBHRs');
         console.log('Available menu_cd values:', dataMenuMBHRs.map(item => item.menu_cd));
-        setDataMenuMBHRIN([]);
+        setDataMenuMBHRAP([]);
       }
     } else {
       console.warn('No menu data available in Redux state');
-      setDataMenuMBHRIN([]);
+      setDataMenuMBHRAP([]);
     }
   }, [dataMenuMBHRs]);
 
@@ -82,11 +81,11 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
 
   const renderItem = ({ item, index }) => {
     return (
-      <MenuItem_Children
+      <MenuItemWithCounts
         item={item}
         index={index}
         onPress={handleMenuPress}
-        showChevron={true}
+        language={language}
       />
     );
   };
@@ -96,7 +95,7 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <EmptyState
           title="Không có dữ liệu menu"
-          subtitle=""
+          subtitle="Vui lòng kiểm tra kết nối và thử lại"
           iconName="menu-open"
           iconSize={80}
         />
@@ -104,7 +103,7 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
     );
   }
 
-  if (dataMenuMBHRIN.length === 0) {
+  if (dataMenuMBHRAP.length === 0) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <EmptyState
@@ -120,7 +119,7 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
-        data={dataMenuMBHRIN}
+        data={dataMenuMBHRAP}
         renderItem={renderItem}
         keyExtractor={(item) => item.pk?.toString() || item.menu_cd}
         contentContainerStyle={styles.listContainer}
@@ -137,8 +136,7 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingTop: 16,
     paddingBottom: 20,
-    paddingHorizontal: 12,
   },
 });
 
-export default List_MBHRIN;
+export default List_MBHRAP;

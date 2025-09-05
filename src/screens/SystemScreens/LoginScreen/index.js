@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -19,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../hooks/useTheme';
 import { loginUser } from '../../../redux/slices/authSlice';
+import AlertPopup from '../../../components/AlertPopup';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { deviceId, STORAGE_KEYS, ERROR_MESSAGES } from '../../../constants';
 import LoadingPopup from '../../../components/LoadingPopup';
@@ -31,9 +31,23 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
   const [eye, setEye] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showLoadingPopup, setShowLoadingPopup] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({});
 
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
+
+  // Helper function để hiển thị alert
+  const showAlert = (title, message, buttons = []) => {
+    console.log('showAlert called:', { title, message, buttons });
+    setAlertConfig({
+      title,
+      message,
+      buttons,
+    });
+    setAlertVisible(true);
+    console.log('AlertPopup should be visible now');
+  };
 
   // Kiểm tra thông tin user đã đăng nhập
   useEffect(() => {
@@ -68,11 +82,11 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
 
   const validateLogin = async () => {
     if (!username.trim()) {
-      Alert.alert(t('notification'), t('pleaseEnterUsername'));
+      showAlert(t('notification'), t('pleaseEnterUsername'));
       return;
     }
     if (!password.trim()) {
-      Alert.alert(t('notification'), t('pleaseEnterPassword'));
+      showAlert(t('notification'), t('pleaseEnterPassword'));
       return;
     }
 
@@ -95,6 +109,7 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
             console.log("Đăng nhập thành công:", result);
             console.log("Thông tin user từ API:", result.user);
             console.log("Token từ API:", result.token);
+            console.log("Sẽ hiển thị AlertPopup...");
 
             // Lưu thêm thông tin vào AsyncStorage
             const saveAdditionalInfo = async () => {
@@ -115,20 +130,14 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
             const department = userInfo.org_nm || userInfo.department || userInfo.dept_name || '';
             const isAdmin = userInfo.sysadmin_yn === 'Y';
 
-            Alert.alert(
+            showAlert(
               t('loginSuccess'),
-              `${t('welcome')} ${displayName}!\n${t('department')}: ${department}\n${t('permission')}: ${isAdmin ? t('admin') : t('user')}`,
+              `${t('welcome')} ${displayName}!`,
               [
-                {
-                  text: t('viewDetails'),
-                  onPress: () => {
-                    // Navigate đến màn hình hiển thị thông tin user
-                    navigation.navigate('UserInfo');
-                  }
-                },
                 {
                   text: t('continue'),
                   onPress: () => {
+                    setAlertVisible(false);
                     if (onLoginSuccess) {
                       onLoginSuccess();
                     }
@@ -141,10 +150,10 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
             setLoading(false);
             setShowLoadingPopup(false); // Ẩn LoadingPopup
             console.error("Lỗi đăng nhập:", error);
-            Alert.alert(t('loginFailed'), error || t('errorOccurred'));
+            showAlert(t('loginFailed'), error || t('errorOccurred'));
           });
       } else {
-        Alert.alert(t('error'), ERROR_MESSAGES.NO_INTERNET);
+        showAlert(t('error'), ERROR_MESSAGES.NO_INTERNET);
       }
     });
   };
@@ -171,9 +180,8 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
             {/* Logo */}
             <View style={styles.logoContainer}>
               <Image
-                source={require('../../../assets/images/login.png')}
+                source={require('../../../assets/images/logo-original.png')}
                 style={styles.logo}
-                resizeMode="contain"
               />
             </View>
 
@@ -289,6 +297,15 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
         message={t('pleaseWait')}
         loadingColor={colors.primary}
       />
+
+      {/* Alert Popup */}
+      <AlertPopup
+        visible={alertVisible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        buttons={alertConfig.buttons}
+        onClose={() => setAlertVisible(false)}
+      />
     </SafeAreaView>
   );
 };
@@ -304,7 +321,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
     marginTop: 20,
   },
   logo: {
@@ -314,6 +331,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     alignItems: "center",
     marginBottom: 30,
+    marginTop: '-30%'
   },
   title: {
     fontSize: 18,

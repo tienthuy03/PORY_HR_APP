@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '../hooks/useTheme';
 import { sysFetch } from '../services/api';
 import { STORAGE_KEYS } from '../constants/storageKeys';
@@ -9,8 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MenuItem_Children from '../components/MenuItem';
 import EmptyState from '../components/EmptyState';
 
-const List_MBHRIN = ({ menuData, onNavigate }) => {
-  const { t } = useTranslation();
+const List_MBHRTI = ({ menuData, onNavigate }) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
   const state = useSelector((state) => state);
@@ -25,10 +23,10 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
     console.warn('Error getting menu data:', error);
   }
 
-  const [dataMenuMBHRIN, setDataMenuMBHRIN] = useState([]);
+  const [dataMenuMBHRTI, setDataMenuMBHRTI] = useState([]);
 
   useEffect(() => {
-    console.log('=== List_MBHRIN Debug ===');
+    console.log('=== List_MBHRTI Debug ===');
     console.log('dataMenuMBHRs:', dataMenuMBHRs);
     console.log('dataMenuMBHRs length:', dataMenuMBHRs?.length);
 
@@ -39,14 +37,14 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
         console.log(`[${index}] menu_cd: ${item.menu_cd}, pk: ${item.pk}, p_pk: ${item.p_pk}, title: ${item.vie || item.title || item.eng}`);
       });
 
-      // Tìm menu cha MBHRIN
-      const mbhrinParent = dataMenuMBHRs.find(i => i.menu_cd === 'MBHRIN');
-      console.log('MBHRIN parent menu:', mbhrinParent);
+      // Tìm menu cha MBHRTI
+      const mbhrtiParent = dataMenuMBHRs.find(i => i.menu_cd === 'MBHRTI');
+      console.log('MBHRTI parent menu:', mbhrtiParent);
 
-      if (mbhrinParent) {
-        // Lọc các menu con có p_pk trùng với pk của MBHRIN
+      if (mbhrtiParent) {
+        // Lọc các menu con có p_pk trùng với pk của MBHRTI
         const childMenus = dataMenuMBHRs.filter(item => {
-          const isChild = item.p_pk === mbhrinParent.pk;
+          const isChild = item.p_pk === mbhrtiParent.pk;
           if (isChild) {
             console.log(`Found child menu: ${item.menu_cd} (pk: ${item.pk}, p_pk: ${item.p_pk})`);
           }
@@ -55,15 +53,15 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
 
         console.log('Total child menus found:', childMenus.length);
         console.log('Child menus:', childMenus);
-        setDataMenuMBHRIN(childMenus);
+        setDataMenuMBHRTI(childMenus);
       } else {
-        console.warn('MBHRIN parent menu not found in dataMenuMBHRs');
+        console.warn('MBHRTI parent menu not found in dataMenuMBHRs');
         console.log('Available menu_cd values:', dataMenuMBHRs.map(item => item.menu_cd));
-        setDataMenuMBHRIN([]);
+        setDataMenuMBHRTI([]);
       }
     } else {
       console.warn('No menu data available in Redux state');
-      setDataMenuMBHRIN([]);
+      setDataMenuMBHRTI([]);
     }
   }, [dataMenuMBHRs]);
 
@@ -104,12 +102,12 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
     );
   }
 
-  if (dataMenuMBHRIN.length === 0) {
+  if (dataMenuMBHRTI.length === 0) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <EmptyState
-          title={t('noChildMenus')}
-          subtitle={t('noFormsConfigured')}
+          title="Không có menu con"
+          subtitle="Chưa có form nào được cấu hình"
           iconName="folder-open"
           iconSize={80}
         />
@@ -120,7 +118,7 @@ const List_MBHRIN = ({ menuData, onNavigate }) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
-        data={dataMenuMBHRIN}
+        data={dataMenuMBHRTI}
         renderItem={renderItem}
         keyExtractor={(item) => item.pk?.toString() || item.menu_cd}
         contentContainerStyle={styles.listContainer}
@@ -141,4 +139,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default List_MBHRIN;
+export default List_MBHRTI;

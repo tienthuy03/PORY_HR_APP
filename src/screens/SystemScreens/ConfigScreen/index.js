@@ -146,7 +146,7 @@ const ConfigScreen = ({ onConfigurationSuccess }) => {
 
     bgImage: {
       width: '100%',
-      height: 300,
+      height: 200,
       marginTop: '4%',
     },
   });
@@ -449,7 +449,7 @@ const ConfigScreen = ({ onConfigurationSuccess }) => {
       <SafeAreaView style={styles.container}>
         <View style={styles.content}>
           <Image
-            source={require('../../../assets/images/setting-account.png')}
+            source={require('../../../assets/images/logo-original.png')}
             style={styles.bgImage}
           />
           <Text style={styles.title}>{t('configTitle')}</Text>

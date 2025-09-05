@@ -6,9 +6,12 @@ import HomeScreen from '../HomeScreen';
 import SettingsScreen from '../SettingsScreen';
 import ProfileScreen from '../ProfileScreen';
 import MBHRIN_TruyVanThongTin from '../MBHRIN_TruyVanThongTin';
+import MBHRRE_DangKyXacNhan from '../MBHRRE_DangKyXacNhan';
+import MBHRTI_ChamCongKhuonMat from '../MBHRTI_ChamCongKhuonMat';
 import DashboardScreen from '../DashBoardScreen';
 import NotificationScreen from '../NotificationScreen';
 import BottomNavigation from '../../../components/BottomNavigation';
+import MBHRAP_QuanLyPheDuyet from '../MBHRAP_QuanLyPheDuyet';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -78,6 +81,30 @@ const MainApp = ({ onLogout }) => {
       <Stack.Screen
         name="MBHRIN"
         component={MBHRIN_TruyVanThongTin}
+        options={{
+          presentation: 'card',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRRE"
+        component={MBHRRE_DangKyXacNhan}
+        options={{
+          presentation: 'card',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRTI"
+        component={MBHRTI_ChamCongKhuonMat}
+        options={{
+          presentation: 'card',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRAP"
+        component={MBHRAP_QuanLyPheDuyet}
         options={{
           presentation: 'card',
           headerShown: false,

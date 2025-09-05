@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../hooks/useTheme';
 
 const CongTyNoti = ({ onCallbackSetDate, startDate, endDate }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
 
   const notifications = [
@@ -59,14 +61,14 @@ const CongTyNoti = ({ onCallbackSetDate, startDate, endDate }) => {
                   { backgroundColor: item.type === 'holiday' ? '#ff6b6b' : '#4ecdc4' }
                 ]}>
                   <Text style={styles.typeText}>
-                    {item.type === 'holiday' ? 'Nghỉ lễ' : 'Họp'}
+                    {item.type === 'holiday' ? t('holiday') : t('meeting')}
                   </Text>
                 </View>
               </View>
             ))
           ) : (
             <View style={styles.emptyState}>
-              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>Không có thông báo nào</Text>
+              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>{t('noNotifications')}</Text>
             </View>
           )}
         </View>

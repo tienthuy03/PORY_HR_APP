@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StatusBar } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../hooks/useTheme';
 import AppHeader from '../../../components/AppHeader';
 import TabBar from '../../../components/TabBar';
@@ -8,10 +9,11 @@ import moment from "moment";
 import ThongKe from './ThongKe';
 import CongTyNoti from './CongTyNoti';
 const DashboardScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const dispatch = useDispatch();
   const state = useSelector(state => state);
-  const [Dashboard, setDashboard] = useState('Bảng tin');
+  const [Dashboard, setDashboard] = useState(t('navDashboard'));
   let language = '';
   let dataLanguage;
   try {
@@ -67,13 +69,13 @@ const DashboardScreen = ({ navigation }) => {
             data={[
               {
                 id: 0,
-                name: 'Cá nhân',
+                name: t('personal'),
                 count: null,
                 screen: <ThongKe />
               },
               {
                 id: 1,
-                name: 'Công ty',
+                name: t('company'),
                 count: null,
                 screen: <CongTyNoti
                   onCallbackSetDate={onCallbackSetDate}

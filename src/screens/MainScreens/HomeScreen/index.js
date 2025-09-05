@@ -21,6 +21,7 @@ import { sysFetch, sysFetch1 } from '../../../services/apiService';
 import { STORAGE_KEYS } from '../../../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SimpleTest from '../../../components/SimpleTest';
+import Avatar from '../../../components/Avatar';
 
 const HomeScreen = (props) => {
   const { t } = useTranslation();
@@ -234,6 +235,13 @@ const HomeScreen = (props) => {
 
   // MenuItem Component
   const MenuItem = ({ item, colors, onPress }) => {
+    if (item.parent === true) {
+      return (
+        <View style={styles.menuItemContent}>
+          <Text>{item.vie || item.title || item.eng || item.menu_cd}</Text>
+        </View>
+      );
+    }
     return (
       <TouchableOpacity
         style={[
@@ -472,7 +480,15 @@ const HomeScreen = (props) => {
           {/* Header Section */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <Image style={styles.imgAvatar} />
+              <Avatar
+                size={50}
+                name={userInfo?.fullName}
+                source={userInfo?.avatar ? { uri: userInfo.avatar } : null}
+                style={styles.imgAvatar}
+                defaultAvatarSource={{
+                  uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+                }}
+              />
               <View style={styles.weatherContainer}>
                 <Text style={[styles.dateText, { color: colors.mainColor }]}>{t('hello')}</Text>
                 <Text style={[styles.weatherText, { color: colors.textPrimary }]}>{userInfo.fullName}</Text>
@@ -527,7 +543,7 @@ const HomeScreen = (props) => {
           ) : (
             <View style={{ padding: 20, alignItems: 'center' }}>
               <Text style={{ color: colors.textSecondary, marginBottom: 10 }}>
-                Không có dữ liệu menu
+                {t('noMenuData')}
               </Text>
               <Text style={{ color: colors.textSecondary, fontSize: 12 }}>
                 dataMenuMBHR length: {dataMenuMBHR.length}

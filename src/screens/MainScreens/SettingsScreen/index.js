@@ -6,7 +6,6 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
-  Alert,
   Switch,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,6 +14,7 @@ import { useTheme } from '../../../hooks/useTheme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { saveTheme, saveLanguage } from '../../../redux/slices/settingsSlice';
 import AppHeader from '../../../components/AppHeader';
+import AlertPopup from '../../../components/AlertPopup';
 const SettingsScreen = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -24,6 +24,15 @@ const SettingsScreen = () => {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [soundNotifications, setSoundNotifications] = useState(true);
+
+  // AlertPopup states
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    type: 'info',
+    title: '',
+    message: '',
+    onConfirm: null,
+  });
 
   const themeOptions = [
     { key: 'light', label: t('lightMode'), icon: 'white-balance-sunny' },
@@ -36,21 +45,47 @@ const SettingsScreen = () => {
     { key: 'en', label: t('english'), flag: '🇺🇸' },
   ];
 
+  const showAlert = (type, title, message, onConfirm = null) => {
+    setAlertConfig({
+      type,
+      title,
+      message,
+      onConfirm,
+    });
+    setAlertVisible(true);
+  };
+
   const handleThemeChange = async (selectedTheme) => {
     try {
       await dispatch(saveTheme(selectedTheme)).unwrap();
-      Alert.alert(t('common.success'), 'Theme updated successfully');
+      showAlert(
+        'success',
+        t('success'),
+        t('themeUpdated')
+      );
     } catch (error) {
-      Alert.alert(t('common.error'), 'Failed to update theme');
+      showAlert(
+        'error',
+        t('error'),
+        t('themeUpdateFailed')
+      );
     }
   };
 
   const handleLanguageChange = async (selectedLanguage) => {
     try {
       await dispatch(saveLanguage(selectedLanguage)).unwrap();
-      Alert.alert(t('common.success'), 'Language updated successfully');
+      showAlert(
+        'success',
+        t('success'),
+        t('languageUpdated')
+      );
     } catch (error) {
-      Alert.alert(t('common.error'), 'Failed to update language');
+      showAlert(
+        'error',
+        t('error'),
+        t('languageUpdateFailed')
+      );
     }
   };
 
@@ -215,7 +250,7 @@ const SettingsScreen = () => {
             {t('buildNumber')}
           </Text>
           <Text style={[styles.aboutValue, { color: colors.textPrimary2 }]}>
-            Build 1
+            {t('buildNumber')}
           </Text>
         </View>
         <View style={[styles.aboutRow, { borderBottomColor: colors.borderLight }]}>
@@ -223,7 +258,7 @@ const SettingsScreen = () => {
             {t('developer')}
           </Text>
           <Text style={[styles.aboutValue, { color: colors.textPrimary2 }]}>
-            PORYHR Team
+            {t('developerTeam')}
           </Text>
         </View>
         <View style={[styles.aboutRow, { borderBottomColor: colors.borderLight }]}>
@@ -231,7 +266,7 @@ const SettingsScreen = () => {
             {t('company')}
           </Text>
           <Text style={[styles.aboutValue, { color: colors.textPrimary2 }]}>
-            PORYHR Company
+            {t('companyName')}
           </Text>
         </View>
       </View>
@@ -246,9 +281,24 @@ const SettingsScreen = () => {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {renderThemeSection()}
         {renderLanguageSection()}
-        {renderNotificationSection()}
+        {/* {renderNotificationSection()} */}
         {renderAboutSection()}
       </ScrollView>
+
+      {/* Custom AlertPopup */}
+      <AlertPopup
+        visible={alertVisible}
+        type={alertConfig.type}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        onConfirm={() => {
+          setAlertVisible(false);
+          if (alertConfig.onConfirm) {
+            alertConfig.onConfirm();
+          }
+        }}
+        onRequestClose={() => setAlertVisible(false)}
+      />
     </SafeAreaView>
   );
 };

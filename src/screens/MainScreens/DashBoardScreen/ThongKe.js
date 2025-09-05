@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../hooks/useTheme';
 
 const ThongKe = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
 
   return (
@@ -10,30 +12,30 @@ const ThongKe = () => {
       <View style={styles.content}>
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <Text style={[styles.title, { color: colors.mainColor }]}>
-            Thống kê cá nhân
+            {t('personalStats')}
           </Text>
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Text style={[styles.statNumber, { color: colors.textPrimary }]}>0</Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Ngày công</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('workingDays')}</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={[styles.statNumber, { color: colors.textPrimary }]}>0</Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Giờ làm</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('workingHours')}</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={[styles.statNumber, { color: colors.textPrimary }]}>0</Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Nghỉ phép</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('leaveDays')}</Text>
             </View>
           </View>
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <Text style={[styles.title, { color: colors.mainColor }]}>
-            Hoạt động gần đây
+            {t('recentActivity')}
           </Text>
           <View style={styles.emptyState}>
-            <Text style={[styles.emptyText, { color: colors.textTertiary }]}>Chưa có hoạt động nào</Text>
+            <Text style={[styles.emptyText, { color: colors.textTertiary }]}>{t('noRecentActivity')}</Text>
           </View>
         </View>
       </View>

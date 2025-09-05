@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../hooks/useTheme';
 
 const MenuItem_Children = ({
@@ -14,24 +15,31 @@ const MenuItem_Children = ({
   customTitle,
   customStyles = {}
 }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
 
   // Lấy title từ props hoặc từ item
-  const displayTitle = customTitle || title || item?.vie || item?.title || item?.eng || item?.menu_cd || 'Unknown';
+  const displayTitle = customTitle || title || item?.vie || item?.title || item?.eng || item?.menu_cd || t('unknown');
 
   // Lấy icon từ props hoặc từ item
   const displayIcon = customIcon || iconName || item?.icon || 'menu';
 
   const styles = StyleSheet.create({
     itemContainer: {
-      marginBottom: 12,
+      marginBottom: 10,
+      borderRadius: 8,
+      backgroundColor: colors.card,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 3.84,
+      elevation: 5,
     },
     menuButton: {
-      borderRadius: 12,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
-      elevation: 4,
+      borderRadius: 8,
       backgroundColor: colors.surface,
       shadowColor: colors.shadow || colors.textSecondary,
     },
@@ -90,6 +98,7 @@ const MenuItem_Children = ({
           <Text style={styles.menuText} numberOfLines={2}>
             {displayTitle}
           </Text>
+
           {showChevron && (
             <View style={styles.chevronContainer}>
               <Icon

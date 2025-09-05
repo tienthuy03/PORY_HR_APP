@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { View, StyleSheet } from "react-native";
 import AppHeader from "../../../components/AppHeader";
 import { useTheme } from "../../../hooks/useTheme";
-import List_MBHRIN from "../../../utils/List_MBHRIN";
+import List_MBHRTI from "../../../utils/List_MBHRTI";
 
-const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
+const MBHRTI_ChamCongKhuonMat = ({ navigation, menuData }) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
   const state = useSelector((state) => state);
@@ -43,29 +43,29 @@ const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
     }
 
     // Fallback: tìm trong state menu
-    if (!dataMenuMBHRs || !language) return "MBHRIN";
+    if (!dataMenuMBHRs || !language) return "MBHRTI";
 
     try {
-      const mbhrinMenu = dataMenuMBHRs.find(item => item.menu_cd === 'MBHRIN');
-      console.log("MBHRIN Menu Data from state: ", mbhrinMenu);
+      const mbhrtiMenu = dataMenuMBHRs.find(item => item.menu_cd === 'MBHRTI');
+      console.log("MBHRTI Menu Data from state: ", mbhrtiMenu);
       console.log("Language: ", language);
-      if (mbhrinMenu) {
+      if (mbhrtiMenu) {
         // Sử dụng ngôn ngữ từ menu data
-        if (language === 'en' && mbhrinMenu.eng) {
-          return mbhrinMenu.eng;
-        } else if (mbhrinMenu.vie) {
-          return mbhrinMenu.vie;
-        } else if (mbhrinMenu.title) {
-          return mbhrinMenu.title;
-        } else if (mbhrinMenu.chi) {
-          return mbhrinMenu.chi;
+        if (language === 'en' && mbhrtiMenu.eng) {
+          return mbhrtiMenu.eng;
+        } else if (mbhrtiMenu.vie) {
+          return mbhrtiMenu.vie;
+        } else if (mbhrtiMenu.title) {
+          return mbhrtiMenu.title;
+        } else if (mbhrtiMenu.chi) {
+          return mbhrtiMenu.chi;
         }
       }
     } catch (error) {
       console.warn('Error getting header title:', error);
     }
 
-    return "MBHRIN";
+    return "MBHRTI";
   };
 
   // Handle navigation for child menu items
@@ -85,7 +85,7 @@ const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
         {getHeaderTitle()}
       </AppHeader>
       <View style={[styles.content, { backgroundColor: colors.background }]}>
-        <List_MBHRIN
+        <List_MBHRTI
           menuData={menuData}
           onNavigate={handleChildMenuNavigation}
         />
@@ -96,4 +96,4 @@ const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
 
 
 
-export default MBHRIN_TruyVanThongTin;
+export default MBHRTI_ChamCongKhuonMat;

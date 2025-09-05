@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../../hooks/useTheme';
 import AppHeader from '../../../components/AppHeader';
 import AppIcon from '../../../components/AppIcon';
+import Avatar from '../../../components/Avatar';
 import { useAuth } from '../../../hooks/useAuth';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -23,10 +24,10 @@ const ProfileScreen = ({ onLogout }) => {
   const userInfo = getUserInfo();
 
   const menuItems = [
-    { icon: 'bell', title: 'Thông báo', subtitle: 'Cài đặt thông báo' },
-    { icon: 'shield-check', title: 'Bảo mật', subtitle: 'Đổi mật khẩu, bảo mật tài khoản' },
-    { icon: 'help-circle', title: 'Trợ giúp', subtitle: 'Hướng dẫn sử dụng' },
-    { icon: 'information', title: 'Về ứng dụng', subtitle: 'Phiên bản 1.0.0' },
+    { icon: 'bell', title: t('notifications'), subtitle: t('notificationsSubtitle') },
+    { icon: 'shield-check', title: t('security'), subtitle: t('securitySubtitle') },
+    { icon: 'help-circle', title: t('help'), subtitle: t('helpSubtitle') },
+    { icon: 'information', title: t('about'), subtitle: t('aboutSubtitle') },
   ];
 
 
@@ -38,7 +39,7 @@ const ProfileScreen = ({ onLogout }) => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <AppHeader showBackButton={false}>
-        Hồ sơ cá nhân
+        {t('personalProfile')}
       </AppHeader>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -46,12 +47,16 @@ const ProfileScreen = ({ onLogout }) => {
         <View style={[styles.profileCard, { backgroundColor: colors.card }]}>
           {/* Main Profile Section */}
           <View style={styles.mainSection}>
-            <View style={[styles.avatarContainer, { backgroundColor: colors.mainColor }]}>
-              {/* Test both AppIcon and direct Icon */}
-              <Icon name="account" size={32} color="white" />
-              {/* Fallback text if icon doesn't show */}
-              <Text style={{ color: 'white', fontSize: 12, marginTop: 4 }}>👤</Text>
-            </View>
+            <Avatar
+              size={80}
+              name={userInfo?.fullName}
+              source={userInfo?.avatar ? { uri: userInfo.avatar } : null}
+              style={styles.avatarContainer}
+              backgroundColor={colors.mainColor}
+              defaultAvatarSource={{
+                uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+              }}
+            />
 
             <View style={styles.profileDetails}>
               <View style={styles.nameSection}>
@@ -72,7 +77,7 @@ const ProfileScreen = ({ onLogout }) => {
               </View>
               <View style={styles.positionSection}>
                 <Text style={[styles.position, { color: colors.textSecondary }]}>
-                  {t('workingStatus')}: {userInfo?.workingStatus || 'Đang làm việc'}
+                  {t('workingStatus')}: {userInfo?.workingStatus || t('workingStatusDefault')}
                 </Text>
               </View>
             </View>
@@ -84,13 +89,13 @@ const ProfileScreen = ({ onLogout }) => {
             onPress={() => handleMenuItemPress({ title: 'Chỉnh sửa hồ sơ' })}
           >
             <Text style={styles.actionButtonText}>
-              CHỈNH SỬA HỒ SƠ {'>'}
+              {t('editProfile')} {'>'}
             </Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.menuSection}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Tùy chọn</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('options')}</Text>
           {menuItems.map((item, index) => (
             <TouchableOpacity
               key={index}
@@ -172,11 +177,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   avatarContainer: {
-    width: 80,
-    height: 100,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: 16,
     shadowColor: '#000',
     shadowOffset: {
