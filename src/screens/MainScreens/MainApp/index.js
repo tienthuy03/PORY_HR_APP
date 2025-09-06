@@ -12,6 +12,9 @@ import DashboardScreen from '../DashBoardScreen';
 import NotificationScreen from '../NotificationScreen';
 import BottomNavigation from '../../../components/BottomNavigation';
 import MBHRAP_QuanLyPheDuyet from '../MBHRAP_QuanLyPheDuyet';
+import MBHRIN001_ThongTinCaNhan from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN001_ThongTinCaNhan';
+import MBHRIN002_ThongTinNgayCong from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN002_ThongTinNgayCong';
+import MBHRIN003_ThongTinCongThang from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN003_ThongTinCongThang';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -78,11 +81,33 @@ const MainApp = ({ onLogout }) => {
       >
         {(props) => <MainTabNavigatorWrapper {...props} onLogout={onLogout} />}
       </Stack.Screen>
+      {/* TRUY VAN THONG TIN */}
       <Stack.Screen
         name="MBHRIN"
         component={MBHRIN_TruyVanThongTin}
         options={{
           presentation: 'card',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRIN001"
+        component={MBHRIN001_ThongTinCaNhan}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRIN002"
+        component={MBHRIN002_ThongTinNgayCong}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRIN003"
+        component={MBHRIN003_ThongTinCongThang}
+        options={{
           headerShown: false,
         }}
       />
@@ -110,6 +135,7 @@ const MainApp = ({ onLogout }) => {
           headerShown: false,
         }}
       />
+
     </Stack.Navigator>
   );
 };

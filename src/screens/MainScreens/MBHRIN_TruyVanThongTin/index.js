@@ -71,8 +71,18 @@ const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
   // Handle navigation for child menu items
   const handleChildMenuNavigation = (menu_cd, item) => {
     console.log('Navigating to child menu:', menu_cd, item);
+
     // Navigate to the appropriate screen based on menu_cd
-    navigation.navigate('FormScreen', {
+    // Map menu_cd to actual screen names
+    const screenMap = {
+      'MBHRIN001': 'MBHRIN001',
+      // Add more mappings as needed
+    };
+
+    const screenName = screenMap[menu_cd] || menu_cd;
+    console.log('Navigating to screen:', screenName);
+
+    navigation.navigate(screenName, {
       menu_cd: menu_cd,
       menuData: item,
       title: item.vie || item.title || item.eng || menu_cd

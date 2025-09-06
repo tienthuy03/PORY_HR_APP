@@ -64,16 +64,9 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
           if (userData.username) {
             setUsername(userData.username);
           }
-        } else {
-          // Set default test credentials
-          setUsername("adminsyshr");
-          setPassword("1911");
         }
       } catch (error) {
         console.log("Lỗi kiểm tra user:", error);
-        // Set default test credentials
-        setUsername("adminsyshr");
-        setPassword("1911");
       }
     };
 
@@ -105,11 +98,9 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
             setLoading(false);
             setShowLoadingPopup(false); // Ẩn LoadingPopup
 
-            // Hiển thị thông tin user từ API thực tế
+            // Log thông tin từ API
             console.log("Đăng nhập thành công:", result);
-            console.log("Thông tin user từ API:", result.user);
-            console.log("Token từ API:", result.token);
-            console.log("Sẽ hiển thị AlertPopup...");
+            console.log("Mã lỗi từ API:", result.error_code || result.code || 'SUCCESS');
 
             // Lưu thêm thông tin vào AsyncStorage
             const saveAdditionalInfo = async () => {
@@ -124,15 +115,13 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
             };
             saveAdditionalInfo();
 
-            // Hiển thị thông báo thành công với thông tin user từ API
-            const userInfo = result.user;
-            const displayName = userInfo.full_name || userInfo.fullName || userInfo.name || userInfo.username;
-            const department = userInfo.org_nm || userInfo.department || userInfo.dept_name || '';
-            const isAdmin = userInfo.sysadmin_yn === 'Y';
+            // Hiển thị thông báo thành công với mã lỗi
+            const errorCode = result.error_code || result.code || 'SUCCESS';
+            const errorMessage = result.error_message || result.message || t('loginSuccess');
 
             showAlert(
               t('loginSuccess'),
-              `${t('welcome')} ${displayName}!`,
+              `Mã lỗi: ${errorCode}\n${errorMessage}`,
               [
                 {
                   text: t('continue'),
@@ -150,7 +139,22 @@ const LoginScreen = ({ navigation, onLoginSuccess }) => {
             setLoading(false);
             setShowLoadingPopup(false); // Ẩn LoadingPopup
             console.error("Lỗi đăng nhập:", error);
-            showAlert(t('loginFailed'), error || t('errorOccurred'));
+
+            // Xử lý lỗi và hiển thị mã lỗi
+            let errorCode = 'UNKNOWN_ERROR';
+            let errorMessage = t('errorOccurred');
+
+            if (error && typeof error === 'object') {
+              errorCode = error.error_code || error.code || error.status || 'UNKNOWN_ERROR';
+              errorMessage = error.error_message || error.message || error.toString();
+            } else if (typeof error === 'string') {
+              errorMessage = error;
+            }
+
+            showAlert(
+              t('loginFailed'),
+              `Mã lỗi: ${errorCode}\n${errorMessage}`
+            );
           });
       } else {
         showAlert(t('error'), ERROR_MESSAGES.NO_INTERNET);

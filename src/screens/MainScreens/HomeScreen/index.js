@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   Image,
@@ -22,6 +21,7 @@ import { STORAGE_KEYS } from '../../../constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SimpleTest from '../../../components/SimpleTest';
 import Avatar from '../../../components/Avatar';
+import AppHeader from '../../../components/AppHeader';
 
 const HomeScreen = (props) => {
   const { t } = useTranslation();
@@ -467,14 +467,13 @@ const HomeScreen = (props) => {
     },
   });
 
-  console.log('dataMenuMBHRs', dataMenuMBHRs);
-
   if (showIconTest) {
     return <SimpleTest />;
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.headerContainer}>
           {/* Header Section */}
@@ -552,7 +551,7 @@ const HomeScreen = (props) => {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
