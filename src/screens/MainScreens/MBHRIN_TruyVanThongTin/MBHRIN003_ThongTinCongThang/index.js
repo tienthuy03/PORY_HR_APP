@@ -1228,7 +1228,7 @@ const MBHRIN003_ThongTinCongThang = ({ navigation: { goBack }, route }) => {
     },
     detailTitle: {
       flex: 1,
-      fontSize: 16,
+      fontSize: 14,
       fontFamily: 'Roboto-Bold',
       textTransform: 'uppercase',
       color: 'white',
@@ -1393,9 +1393,12 @@ const MBHRIN003_ThongTinCongThang = ({ navigation: { goBack }, route }) => {
           let datass = [];
           let datassDB = [];
           if (res.totalRow > 0) {
-            if (res.data?.ttct && res.data.ttct.length > 0) {
-              let map = new Map(Object.entries(res.data.ttct[0]));
-              let mapDB = new Map(Object.entries(res.data.ttct[1]));
+            // if (res.data?.ttct && res.data.ttct.length > 0) {
+            if (dataCT.ttct && dataCT.ttct.length > 0) {
+              // let map = new Map(Object.entries(res.data.ttct[0]));
+              let map = new Map(Object.entries(dataCT.ttct[0]));
+              // let mapDB = new Map(Object.entries(res.data.ttct[1]));
+              let mapDB = new Map(Object.entries(dataCT.ttct[1]));
               map.forEach((value, key) => {
                 if (key.charAt(0) === '_') {
                   datass.push({ key, value });
@@ -1413,11 +1416,13 @@ const MBHRIN003_ThongTinCongThang = ({ navigation: { goBack }, route }) => {
               setDataDB([]);
             }
 
-            if (res.data?.ttct_detail) {
+            // if (res.data?.ttct_detail) {
+            if (dataCT?.ttct_detail) {
               // Filter data dựa trên bucong_yn nếu có, nếu không thì hiển thị tất cả ở tab "Chưa bù công"
-              const data1Filtered = res.data.ttct_detail.filter(x => x.bucong_yn === '0' || x.bucong_yn === undefined);
-              const dataDB1Filtered = res.data.ttct_detail.filter(x => x.bucong_yn === '1');
-
+              // const data1Filtered = res.data.ttct_detail.filter(x => x.bucong_yn === '0' || x.bucong_yn === undefined);
+              // const dataDB1Filtered = res.data.ttct_detail.filter(x => x.bucong_yn === '1');
+              const data1Filtered = dataCT.ttct_detail.filter(x => x.bucong_yn === '0' || x.bucong_yn === undefined);
+              const dataDB1Filtered = dataCT.ttct_detail.filter(x => x.bucong_yn === '1');
               setData1(data1Filtered);
               setDataDB1(dataDB1Filtered);
             }
@@ -1505,7 +1510,7 @@ const MBHRIN003_ThongTinCongThang = ({ navigation: { goBack }, route }) => {
                 title={t('noData') || 'Không có dữ liệu'}
                 subtitle={t('noWorkDayData') || 'Không có dữ liệu công tháng'}
                 iconName="calendar-blank"
-                iconSize={64}
+                iconSize={32}
               />
             )}
           />
