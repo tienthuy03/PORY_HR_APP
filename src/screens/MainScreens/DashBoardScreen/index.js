@@ -12,19 +12,14 @@ const DashboardScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const dispatch = useDispatch();
-  const state = useSelector(state => state);
+  // Sử dụng selector cụ thể thay vì lấy toàn bộ state
+  const userLanguage = useSelector((state) => state.auth?.user?.user_language);
+  const languageData = useSelector((state) => state.languageReducer?.data?.data?.language);
+  const loginData = useSelector((state) => state.loginReducers?.data?.data);
+
   const [Dashboard, setDashboard] = useState(t('navDashboard'));
-  let language = '';
-  let dataLanguage;
-  try {
-    dataLanguage = state.languageReducer.data.data.language;
-    language =
-      state.loginReducers.data.data.user_language == undefined
-        ? 'VIE'
-        : state.loginReducers.data.data.user_language;
-  } catch (error) {
-    //
-  }
+  let language = userLanguage || 'VIE';
+  let dataLanguage = languageData;
 
   useEffect(() => {
     if (dataLanguage !== undefined) {

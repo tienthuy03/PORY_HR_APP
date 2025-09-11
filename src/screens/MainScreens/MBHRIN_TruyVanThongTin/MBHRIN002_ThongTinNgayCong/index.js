@@ -1,43 +1,37 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  RefreshControl,
-  Modal
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { useTheme } from '../../../../hooks/useTheme';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../../../hooks/useAuth';
-import AppHeader from '../../../../components/AppHeader';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { sysFetch } from '../../../../services/apiService';
-import moment from "moment";
 import NetInfo from "@react-native-community/netinfo";
-import RNRestart from "react-native-restart";
-import EmptyState from '../../../../components/EmptyState';
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
+import {
+  Alert,
+  Modal,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AppHeader from '../../../../components/AppHeader';
 import CalendarComponent from '../../../../components/Calendar';
+import EmptyState from '../../../../components/EmptyState';
+import { useAuth } from '../../../../hooks/useAuth';
+import { useTheme } from '../../../../hooks/useTheme';
+import { sysFetch } from '../../../../services/apiService';
 const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
   const { getUserInfo } = useAuth();
 
   // Get data from navigation params
-  const { menuData, title, menu_cd } = route?.params || {};
+  const { title } = route?.params || {};
 
   // Get user info from new auth system
   const userInfo = getUserInfo();
-  const authState = useSelector((state) => state.auth);
-  const menuState = useSelector((state) => state.menu);
 
   // Get API URL from storage or config
   const [API_URL, setAPI_URL] = useState('');
-  const [tokenLogin, setTokenLogin] = useState('');
 
   // State for data
   const [dataTtnc, setDataTtnc] = useState([]);
@@ -50,9 +44,7 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
       try {
         const AsyncStorage = require('@react-native-async-storage/async-storage').default;
         const apiUrl = await AsyncStorage.getItem('API_URL');
-        const token = await AsyncStorage.getItem('USER_TOKEN');
         setAPI_URL(apiUrl);
-        setTokenLogin(token);
       } catch (error) {
         console.log('Error getting API config:', error);
       }
@@ -60,23 +52,25 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
     getAPIConfig();
   }, []);
 
-  // Date states
+  // Get token from userInfo
+  const tokenLogin = userInfo?.tokenLogin;
+
+  // Date states - sử dụng ngày hiện tại
   const [startDay, setStartDay] = useState(
-    moment(new Date()).format("YYYY-MM-DD")
+    moment().format("YYYY-MM-DD")
   );
   const [endDay, setEndDay] = useState(
-    moment(new Date()).format("YYYY-MM-DD")
+    moment().format("YYYY-MM-DD")
   );
   const [daySelect, setDateSelect] = useState(
-    moment(new Date()).format("DD/MM/YYYY")
+    moment().format("DD/MM/YYYY")
   );
   const [modalVisible, setModalVisible] = useState(false);
 
-  const showPicker = useCallback((value) => setModalVisible(value), []);
 
-  const onValueChange = useCallback(() => {
-    showPicker(true);
-  }, [showPicker]);
+  const onValueChange = () => {
+    setModalVisible(true);
+  };
 
   const getState = (result) => {
     setModalVisible(false);
@@ -85,34 +79,32 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
     setDateSelect(result.daySelecteds);
   };
   const refreshNewToken = (callback) => {
-    // Implement token refresh logic here if needed
-    console.log('Token expired, need to refresh');
-    // For now, just call the callback
     if (callback === "getData") {
       getData();
     }
   };
+
   const getData = () => {
+    // Kiểm tra các giá trị cần thiết
     if (!API_URL || !tokenLogin || !userInfo?.empPk) {
-      console.log('Missing required parameters for getData');
       return;
     }
 
     setLoading(true);
-    console.log("API URL:", API_URL);
-    console.log("User empPk:", userInfo.empPk);
-    console.log("Date range:", startDay, "to", endDay);
+
+    const in_par = {
+      p1_varchar2: userInfo.empPk,
+      p2_varchar2: userInfo.crt_by,
+      p3_varchar2: moment(startDay).format("YYYYMMDD"),
+      p4_varchar2: moment(endDay).format("YYYYMMDD"),
+    }
+    console.log("API params:", in_par);
 
     sysFetch(
       API_URL,
       {
-        pro: "SELHRIN0020101",
-        in_par: {
-          p1_varchar2: userInfo.empPk,
-          p2_varchar2: userInfo.fullName,
-          p3_varchar2: moment(startDay).format("YYYYMMDD"),
-          p4_varchar2: moment(endDay).format("YYYYMMDD"),
-        },
+        pro: "stv_hr_sel_mbi_hrin002_0_101",
+        in_par: in_par,
         out_par: {
           p1_sys: "ttnc",
         },
@@ -128,7 +120,18 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
         } else if (rs && rs.results === "S") {
           setDataTtnc(rs.data.ttnc || []);
         } else {
-          console.log('API response error:', rs);
+          if (rs && rs.errorData && rs.errorData.includes("ORA-01403")) {
+            Alert.alert(
+              'Không có dữ liệu',
+              'Không có dữ liệu ngày công cho khoảng thời gian đã chọn'
+            );
+          } else {
+            Alert.alert(
+              'Lỗi',
+              rs?.errorData || 'Lỗi API'
+            );
+          }
+          setDataTtnc([]);
         }
       })
       .catch((error) => {
@@ -137,22 +140,22 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
         console.log("API error:", error);
       });
   };
+
+  useEffect(() => {
+    NetInfo.fetch().then((state) => {
+      if (state.isConnected) {
+        getData();
+      } else {
+        ShowError("No internet");
+      }
+    });
+  }, [startDay, endDay]);
+
   const onRefresh = () => {
     setRefreshing(true);
     getData();
   };
 
-  useEffect(() => {
-    if (API_URL && tokenLogin && userInfo?.empPk) {
-      NetInfo.fetch().then((state) => {
-        if (state.isConnected) {
-          getData();
-        } else {
-          Alert.alert(t('error'), t('noInternetConnection'));
-        }
-      });
-    }
-  }, [startDay, endDay, API_URL, tokenLogin, userInfo?.empPk]);
 
   const renderDatePickerModal = () => (
     <Modal
@@ -192,23 +195,48 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
     </Modal>
   );
 
-  const renderDataItem = (item, index) => (
-    <View key={index} style={[styles.dataItem, {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-      shadowColor: colors.shadow,
-    }]}>
-      <View style={styles.dataItemHeader}>
-        <Icon name="calendar-clock" size={20} color={colors.primary} />
-        <Text style={[styles.dataItemTitle, { color: colors.textPrimary }]}>
-          {t('workDay')} {index + 1}
-        </Text>
+  const renderDataItem = (item, index) => {
+    return (
+      <View key={index} style={[styles.dataItem, {
+        backgroundColor: colors.card,
+        borderColor: colors.border,
+        shadowColor: colors.shadow,
+      }]}>
+        {/* Header với work_date_lb */}
+        <View style={[styles.dataItemHeader, { backgroundColor: colors.primary }]}>
+          <Icon name="calendar-clock" size={20} color="white" />
+          <Text style={[styles.dataItemTitle, { color: 'white' }]}>
+            {item.work_date_lb || `${t('workDay')} ${index + 1}`}
+          </Text>
+        </View>
+
+        {/* Content với các field có '_' */}
+        <View style={styles.dataItemContent}>
+          {Object.entries(item)
+            .filter((i) => i[0].substr(0, 1) === '_') // Lọc trước để đếm được số lượng
+            .map((i, cIndex, array) => {
+              const keyName = i[0].charAt(1).toUpperCase() + i[0].slice(2);
+              const value = i[1] || '';
+              const isLastItem = cIndex === array.length - 1; // Kiểm tra dòng cuối
+
+              return (
+                <View key={cIndex} style={[
+                  styles.dataField,
+                  isLastItem && styles.dataFieldLast // Bỏ border bottom cho dòng cuối
+                ]}>
+                  <Text style={[styles.dataFieldLabel, { color: colors.textPrimary }]}>
+                    {keyName}
+                  </Text>
+                  <Text style={[styles.dataFieldValue, { color: colors.textSecondary }]}>
+                    {value}
+                  </Text>
+                </View>
+              );
+            })}
+        </View>
       </View>
-      <Text style={[styles.dataText, { color: colors.textSecondary }]}>
-        {JSON.stringify(item, null, 2)}
-      </Text>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -219,6 +247,7 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled={true}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -246,6 +275,7 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
+
         {/* Data List */}
         {loading ? (
           <View style={[styles.loadingContainer, { backgroundColor: colors.surface }]}>
@@ -261,7 +291,7 @@ const MBHRIN002_ThongTinNgayCong = ({ navigation, route }) => {
         ) : (
           <EmptyState
             title={t('noWorkDayData')}
-            subtitle={t('selectDifferentDate')}
+            subtitle=""
             iconName="calendar-blank"
             iconSize={64}
           />
@@ -279,11 +309,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: 12,
   },
   datePickerCard: {
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 8,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -295,11 +325,10 @@ const styles = StyleSheet.create({
   datePickerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: 8,
   },
   datePickerTextContainer: {
     flex: 1,
-    marginLeft: 12,
   },
   datePickerText: {
     fontSize: 16,
@@ -383,35 +412,60 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   dataContainer: {
-    marginTop: 8,
+    // marginTop: 8,
   },
   dataItem: {
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
+    marginBottom: 12,
     borderWidth: 1,
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 2,
     },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+    overflow: 'hidden',
   },
   dataItemHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    padding: 12,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   dataItemTitle: {
     fontSize: 16,
-    fontFamily: 'Roboto-Medium',
+    fontFamily: 'Roboto-Bold',
     marginLeft: 8,
+    fontWeight: '600',
   },
-  dataText: {
-    fontSize: 12,
+  dataItemContent: {
+    padding: 12,
+    backgroundColor: 'white',
+  },
+  dataField: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  dataFieldLast: {
+    borderBottomWidth: 0, // Bỏ border bottom cho dòng cuối
+  },
+  dataFieldLabel: {
+    fontSize: 14,
     fontFamily: 'Roboto-Regular',
-    lineHeight: 16,
+    flex: 1,
+  },
+  dataFieldValue: {
+    fontSize: 14,
+    fontFamily: 'Roboto-Medium',
+    fontWeight: '500',
+    textAlign: 'right',
+    flex: 1,
   },
 });
 

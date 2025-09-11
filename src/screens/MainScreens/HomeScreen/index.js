@@ -71,14 +71,6 @@ const HomeScreen = (props) => {
     // You can call login again or implement refresh token logic
   };
 
-  // Debug logs
-  console.log('=== Debug Info ===');
-  console.log('dataMenuMBHR length:', dataMenuMBHR.length);
-  console.log('loadMenu:', loadMenu);
-  console.log('menuFetched:', menuFetched);
-  console.log('API_URL exists:', !!API_URL);
-  console.log('tokenLogin exists:', !!tokenLogin);
-  console.log('userInfo exists:', !!userInfo);
 
   let dataMenuMBHRs;
   const getMenu = () => {
@@ -122,7 +114,7 @@ const HomeScreen = (props) => {
           console.log('Processing menu data...');
           setLoadMenu(false);
           dataMenuMBHRs = rs.data?.menu || [];
-          console.log('Raw menu data:', dataMenuMBHRs);
+          // console.log('Raw menu data:', dataMenuMBHRs);
 
           let dataMenuMBHRc = [];
           try {
@@ -135,8 +127,6 @@ const HomeScreen = (props) => {
             const parentMenus = dataMenuMBHRs.filter(item => item.menu_cd && item.menu_cd.length === 6);
             const childMenus = dataMenuMBHRs.filter(item => item.menu_cd && item.menu_cd.length > 6);
 
-            console.log("Parent menus (for layout):", parentMenus.length);
-            console.log("Child menus (for Redux):", childMenus.length);
 
             if (userInfo.menuType == 2) {
               console.log("userInfo.menuType ", 0 % 3);
@@ -200,13 +190,9 @@ const HomeScreen = (props) => {
               ...childMenus.filter(x => x.menu_cd !== "MBHRAN" && x.menu_cd !== "MBSYSY")
             ];
 
-            console.log('Final menu data (for display):', finalMenuData);
-            console.log('Final menu data with children (for Redux):', finalMenuDataWithChildren);
             setDataMenuMBHR(finalMenuData);
             // Dispatch vào menuReducer giống src_old - bao gồm cả menu cha và menu con
-            console.log('Dispatching to Redux:', finalMenuDataWithChildren);
             dispatch(setMenuData(finalMenuDataWithChildren));
-            console.log('Menu data dispatched to Redux');
           } catch (error) {
             setLoadMenu(false);
             console.log(error);
@@ -221,9 +207,6 @@ const HomeScreen = (props) => {
 
   // Handle menu item press - Navigate to appropriate stack
   const handleMenuItemPress = (item) => {
-    console.log('Navigate to:', item.menu_cd);
-    console.log('Menu Item Data:', item);
-    console.log('Menu Title:', item.vie || item.title || item.eng || item.menu_cd);
 
     // Use callback function to navigate instead of navigation object
     if (props.onNavigate) {
@@ -474,7 +457,7 @@ const HomeScreen = (props) => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
         <View style={styles.headerContainer}>
           {/* Header Section */}
           <View style={styles.header}>
@@ -538,6 +521,8 @@ const HomeScreen = (props) => {
               renderItem={renderMenuItem}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.flatListContainer}
+              nestedScrollEnabled={true}
+              scrollEnabled={false}
             />
           ) : (
             <View style={{ padding: 20, alignItems: 'center' }}>

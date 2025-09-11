@@ -11,31 +11,21 @@ import EmptyState from '../components/EmptyState';
 const List_MBHRRE = ({ menuData, onNavigate }) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
-  const state = useSelector((state) => state);
+  // Sử dụng selector cụ thể thay vì lấy toàn bộ state
+  const menuDataFromState = useSelector((state) => state.menu?.data?.data?.menu);
+  const userLanguage = useSelector((state) => state.auth?.user?.user_language);
 
-  let dataMenuMBHRs;
-  let language;
-
-  try {
-    dataMenuMBHRs = state.menu.data.data.menu;
-    language = state.auth.user?.user_language || 'vi';
-  } catch (error) {
-    console.warn('Error getting menu data:', error);
-  }
+  let dataMenuMBHRs = menuDataFromState;
+  let language = userLanguage || 'vi';
 
   const [dataMenuMBHRRRE, setDataMenuMBHRRRE] = useState([]);
 
   useEffect(() => {
     console.log('=== List_MBHRRE Debug ===');
-    console.log('dataMenuMBHRs:', dataMenuMBHRs);
-    console.log('dataMenuMBHRs length:', dataMenuMBHRs?.length);
 
     if (dataMenuMBHRs && dataMenuMBHRs.length > 0) {
       // Log tất cả menu để debug
-      console.log('All menu items:');
-      dataMenuMBHRs.forEach((item, index) => {
-        console.log(`[${index}] menu_cd: ${item.menu_cd}, pk: ${item.pk}, p_pk: ${item.p_pk}, title: ${item.vie || item.title || item.eng}`);
-      });
+
 
       // Tìm menu cha MBHRIN
       const mbhrreParent = dataMenuMBHRs.find(i => i.menu_cd === 'MBHRRE');
@@ -51,8 +41,6 @@ const List_MBHRRE = ({ menuData, onNavigate }) => {
           return isChild;
         });
 
-        console.log('Total child menus found:', childMenus.length);
-        console.log('Child menus:', childMenus);
         setDataMenuMBHRRRE(childMenus);
       } else {
         console.warn('MBHRIN parent menu not found in dataMenuMBHRs');

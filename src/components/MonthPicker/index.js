@@ -33,18 +33,18 @@ const MonthPicker = ({
   }, [selectedMonth]);
 
   const months = [
-    { key: 0, name: t('month_1') },
-    { key: 1, name: t('month_2') },
-    { key: 2, name: t('month_3') },
-    { key: 3, name: t('month_4') },
-    { key: 4, name: t('month_5') },
-    { key: 5, name: t('month_6') },
-    { key: 6, name: t('month_7') },
-    { key: 7, name: t('month_8') },
-    { key: 8, name: t('month_9') },
-    { key: 9, name: t('month_10') },
-    { key: 10, name: t('month_11') },
-    { key: 11, name: t('month_12') },
+    { key: 0, name: 'Tháng 1' },
+    { key: 1, name: 'Tháng 2' },
+    { key: 2, name: 'Tháng 3' },
+    { key: 3, name: 'Tháng 4' },
+    { key: 4, name: 'Tháng 5' },
+    { key: 5, name: 'Tháng 6' },
+    { key: 6, name: 'Tháng 7' },
+    { key: 7, name: 'Tháng 8' },
+    { key: 8, name: 'Tháng 9' },
+    { key: 9, name: 'Tháng 10' },
+    { key: 10, name: 'Tháng 11' },
+    { key: 11, name: 'Tháng 12' },
   ];
 
   const handleMonthSelect = (monthKey) => {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Roboto-Bold',
   },
   closeButton: {
     padding: 4,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   yearText: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Roboto-Bold',
   },
   monthGrid: {
     flexDirection: 'row',
@@ -242,11 +242,11 @@ const styles = StyleSheet.create({
   },
   monthText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: 'Roboto-Medium',
     textAlign: 'center',
   },
   selectedMonthText: {
-    fontWeight: 'bold',
+    fontFamily: 'Roboto-Bold',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: 16,
-    fontWeight: '500',
+    fontFamily: 'Roboto-Medium',
   },
   confirmButton: {
     flex: 1,
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Roboto-Bold',
   },
 });
 

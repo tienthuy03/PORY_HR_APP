@@ -29,11 +29,13 @@ const EmptyState = ({
       paddingVertical: 40,
     },
     iconContainer: {
-      marginBottom: 24,
+      marginBottom: 12,
       opacity: 0.6,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     title: {
-      fontSize: 18,
+      fontSize: 16,
       fontFamily: 'Roboto-Medium',
       color: colors.textPrimary,
       textAlign: 'center',

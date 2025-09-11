@@ -8,9 +8,13 @@ import List_MBHRTI from "../../../utils/List_MBHRTI";
 const MBHRTI_ChamCongKhuonMat = ({ navigation, menuData }) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
-  const state = useSelector((state) => state);
-  let dataMenuMBHRs;
-  let language;
+  // Sử dụng selector cụ thể thay vì lấy toàn bộ state
+  const menuDataFromState = useSelector((state) => state.menu?.data?.data?.menu);
+  const userLanguage = useSelector((state) => state.auth?.user?.user_language);
+
+  let dataMenuMBHRs = menuDataFromState;
+  let language = userLanguage || 'vi';
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -20,12 +24,6 @@ const MBHRTI_ChamCongKhuonMat = ({ navigation, menuData }) => {
       paddingTop: 8,
     },
   });
-  try {
-    dataMenuMBHRs = state.menu.data.data.menu;
-    language = state.auth.user?.user_language || 'vi';
-  } catch (error) {
-    console.warn('Error getting menu data:', error);
-  }
 
   const getHeaderTitle = () => {
     // Ưu tiên sử dụng data được truyền từ props

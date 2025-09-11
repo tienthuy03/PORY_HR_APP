@@ -15,6 +15,12 @@ import MBHRAP_QuanLyPheDuyet from '../MBHRAP_QuanLyPheDuyet';
 import MBHRIN001_ThongTinCaNhan from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN001_ThongTinCaNhan';
 import MBHRIN002_ThongTinNgayCong from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN002_ThongTinNgayCong';
 import MBHRIN003_ThongTinCongThang from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN003_ThongTinCongThang';
+import MBHRIN004_ThongTinLuongThang from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN004_ThongTinLuongThang';
+import MBHRIN005_ThongTinNgayNghi from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN005_ThongTinNgayNghi';
+import MBHRIN009_ThongTinPhepNam from '../../MainScreens/MBHRIN_TruyVanThongTin/MBHRIN009_ThongTinPhepNam';
+
+
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -107,6 +113,27 @@ const MainApp = ({ onLogout }) => {
       <Stack.Screen
         name="MBHRIN003"
         component={MBHRIN003_ThongTinCongThang}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRIN004"
+        component={MBHRIN004_ThongTinLuongThang}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRIN005"
+        component={MBHRIN005_ThongTinNgayNghi}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="MBHRIN009"
+        component={MBHRIN009_ThongTinPhepNam}
         options={{
           headerShown: false,
         }}

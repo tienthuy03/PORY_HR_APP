@@ -8,9 +8,13 @@ import List_MBHRIN from "../../../utils/List_MBHRIN";
 const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
   const { colors } = useTheme();
   const dispatch = useDispatch();
-  const state = useSelector((state) => state);
-  let dataMenuMBHRs;
-  let language;
+  // Sử dụng selector cụ thể thay vì lấy toàn bộ state
+  const menuDataFromState = useSelector((state) => state.menu?.data?.data?.menu);
+  const userLanguage = useSelector((state) => state.auth?.user?.user_language);
+
+  let dataMenuMBHRs = menuDataFromState;
+  let language = userLanguage || 'vi';
+
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -20,12 +24,6 @@ const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
       paddingTop: 8,
     },
   });
-  try {
-    dataMenuMBHRs = state.menu.data.data.menu;
-    language = state.auth.user?.user_language || 'vi';
-  } catch (error) {
-    console.warn('Error getting menu data:', error);
-  }
 
   const getHeaderTitle = () => {
     // Ưu tiên sử dụng data được truyền từ props
@@ -70,7 +68,6 @@ const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
 
   // Handle navigation for child menu items
   const handleChildMenuNavigation = (menu_cd, item) => {
-    console.log('Navigating to child menu:', menu_cd, item);
 
     // Navigate to the appropriate screen based on menu_cd
     // Map menu_cd to actual screen names
@@ -80,7 +77,6 @@ const MBHRIN_TruyVanThongTin = ({ navigation, menuData }) => {
     };
 
     const screenName = screenMap[menu_cd] || menu_cd;
-    console.log('Navigating to screen:', screenName);
 
     navigation.navigate(screenName, {
       menu_cd: menu_cd,
